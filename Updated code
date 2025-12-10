@@ -1,0 +1,140 @@
+SELECT * from payments;
+
+
+Alter table room
+ALTER COLUMN price_per_night TYPE DECIMAL(10,2);
+
+CREATE TABLE Room (
+   room_id SERIAL Primary key,
+   room_number varchar(50) UNIQUE NOT NULL,
+   room_type varchar(50),
+   price_per_night decimal(10,2),
+   Status varchar(20) DEFAULT 'Available'
+   );
+
+CREATE TABLE Customers (
+   customer_id SERIAL Primary key,
+   full_name varchar(100),
+   phone_number varchar(15),
+   email_id varchar(100),
+   gender varchar(10)
+   );
+
+CREATE TABLE Bookings (
+   booking_id SERIAL Primary key,
+   customer_id INT REFERENCES customers(customer_id),
+   room_id INT REFERENCES room(room_id),
+   check_in date,
+   check_out date,
+   total_amount DECIMAL (10,2)
+);
+
+CREATE TABLE Payments(
+   payment_id  SERIAL Primary key,
+   booking_id INT REFERENCES bookings(booking_id),
+   payment_date DATE DEFAULT CURRENT_DATE,
+   Amount NUMERIC(10,2),
+   Payment_method varchar(20)    
+);
+
+INSERT INTO Room (room_number, room_type, price_per_night, status)
+VALUES 
+('101','Single',1500,'Available'),
+('102','Double',2500,'Available'),
+('103','Deluxe',3500,'Available'),
+('104','Suite',5000,'Available'),
+('105','Single',1500,'Available'),
+('106','Double',2500,'Available'),
+('107','Deluxe',3500,'Available'),
+('108','Suite',5000,'Available'),
+('109','Single',1500,'Available'),
+('110','Double',2500,'Available'),
+('111','Deluxe',3500,'Available'),
+('112','Suite',5000,'Available'),
+('113','Single',1500,'Available'),
+('114','Double',2500,'Available'),
+('115','Deluxe',3500,'Available');
+
+INSERT INTO Customers(full_name, phone_number, email_id, gender)
+VALUES 
+('Amit Kumar','9876543210','amit@gmail.com','Male'),
+('Pooja Reddy','9988776655','pooja@gmail.com','Female'),
+('Rahul Sharma','9123456789','rahul@gmail.com','Male'),
+('Sneha Patil','9876501234','sneha@gmail.com','Female'),
+('Vikram Singh','9123409876','vikram@gmail.com','Male'),
+('Neha Gupta','9876512340','neha@gmail.com','Female'),
+('Rohan Das','9123412345','rohan@gmail.com','Male'),
+('Anjali Mehta','9876523456','anjali@gmail.com','Female'),
+('Karan Joshi','9123423456','karan@gmail.com','Male'),
+('Sonia Kapoor','9876534567','sonia@gmail.com','Female'),
+('Manish Sharma','9123434567','manish@gmail.com','Male'),
+('Divya Rao','9876545678','divya@gmail.com','Female'),
+('Aakash Verma','9123445678','aakash@gmail.com','Male'),
+('Priya Singh','9876556789','priya@gmail.com','Female'),
+('Ritesh Kumar','9123456780','ritesh@gmail.com','Male');
+
+INSERT INTO Bookings(customer_id, room_id, check_in, check_out, total_amount)
+VALUES
+(1,1,'2025-01-10','2025-01-12',1500*2),
+(2,2,'2025-01-15','2025-01-18',2500*3),
+(3,3,'2025-01-20','2025-01-22',3500*2),
+(4,4,'2025-01-25','2025-01-28',5000*3),
+(5,5,'2025-02-01','2025-02-03',1500*2),
+(6,6,'2025-02-05','2025-02-08',2500*3),
+(7,7,'2025-02-10','2025-02-12',3500*2),
+(8,8,'2025-02-15','2025-02-18',5000*3),
+(9,9,'2025-02-20','2025-02-22',1500*2),
+(10,10,'2025-02-25','2025-02-28',2500*3),
+(11,11,'2025-03-01','2025-03-03',3500*2),
+(12,12,'2025-03-05','2025-03-08',5000*3),
+(13,13,'2025-03-10','2025-03-12',1500*2),
+(14,14,'2025-03-15','2025-03-18',2500*3),
+(15,15,'2025-03-20','2025-03-22',3500*2);
+
+INSERT INTO Payments(booking_id, payment_date, amount, payment_method)
+VALUES
+(1,'2025-01-10',3000,'UPI'),
+(2,'2025-01-15',7500,'Card'),
+(3,'2025-01-20',7000,'Cash'),
+(4,'2025-01-25',15000,'Card'),
+(5,'2025-02-01',3000,'UPI'),
+(6,'2025-02-05',7500,'Card'),
+(7,'2025-02-10',7000,'Cash'),
+(8,'2025-02-15',15000,'Card'),
+(9,'2025-02-20',3000,'UPI'),
+(10,'2025-02-25',7500,'Card'),
+(11,'2025-03-01',7000,'Cash'),
+(12,'2025-03-05',15000,'Card'),
+(13,'2025-03-10',3000,'UPI'),
+(14,'2025-03-15',7500,'Card'),
+(15,'2025-03-20',7000,'Cash');
+
+
+--LIST OF AVAILABLE ROOMS
+
+SELECT * FROM ROOM
+WHERE STATUS = 'Available';
+
+
+--SHOW ALL BOOKINGS WITH CUSTOMERS NAME
+
+SELECT B.booking_id , C.full_name, R.room_type
+FROM Bookings B
+JOIN Customers c ON B.customer_id = C.customer_id
+JOIN Room R ON B.room_id = R.room_id;
+
+--CALCULATING NUMBER OF NIGHTS
+
+SELECT booking_id,(check_out - check_in) AS Nights
+FROM Bookings;
+
+--TOTEL REVENUE
+
+SELECT SUM(amount) AS Total_revenue FROM payments;
+
+--Customers with their booking count
+
+SELECT c.full_name, COUNT(b.booking_id) AS total_bookings
+FROM Customers c
+LEFT JOIN  bookings b  ON C.customer_id = b.customer_id
+GROUP BY C.full_name;
